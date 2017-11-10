@@ -1,8 +1,11 @@
 package main;
 
 import java.io.File;
+import java.util.Vector;
 
 import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.RList;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 
@@ -27,13 +30,21 @@ public class R2JavaHelper {
 	/**
 	 * Private constructor of the class.
 	 * 
-	 * @throws RserveException
+	 * @throws Exception
 	 *             An exception is thrown when Java is unable to connect to
 	 *             RServe.
 	 */
-	private R2JavaHelper() throws RserveException {
+	private R2JavaHelper() throws Exception {
 
-		rconnect = new RConnection();
+		try {
+
+			rconnect = new RConnection();
+
+		} catch (RserveException e) {
+
+			throw new Exception(e.getMessage());
+
+		}
 
 	}
 
@@ -41,11 +52,11 @@ public class R2JavaHelper {
 	 * Allows to obtain the unique instance of the class.
 	 * 
 	 * @return Unique instance of the class.
-	 * @throws RserveException
+	 * @throws Exception
 	 *             An exception is thrown when Java is unable to connect to
 	 *             RServe.
 	 */
-	public static R2JavaHelper getInstance() throws RserveException {
+	public static R2JavaHelper getInstance() throws Exception {
 
 		if (instance == null) {
 			instance = new R2JavaHelper();
@@ -56,34 +67,225 @@ public class R2JavaHelper {
 	}
 
 	/**
+	 * Allows to generate the definition of the function to be called.
+	 * 
+	 * @param functionName
+	 *            The name of the function.
+	 * @param parameters
+	 *            The parameters of the function.
+	 * @return The definition of the function.
+	 */
+	private String constructFunctionDefinition(String functionName, String[] parameters) {
+
+		StringBuilder definition = new StringBuilder();
+
+		definition.append(functionName);
+
+		definition.append("(");
+
+		boolean first = true;
+
+		if (parameters != null) {
+
+			for (String param : parameters) {
+
+				String realParam = "'" + param + "'";
+
+				if (first) {
+
+					definition.append(realParam);
+
+					first = false;
+				} else {
+
+					definition.append("," + realParam);
+
+				}
+
+			}
+
+		}
+
+		definition.append(")");
+
+		return definition.toString();
+
+	}
+
+	/**
 	 * Allows to evaluate an R script.
 	 * 
 	 * @param scriptPath
 	 *            The path of the script to evaluate.
+	 * @param functionName
+	 *            The name of the function.
+	 * @param parameters
+	 *            The parameters of the function.
 	 * @return The result of the script evaluation.
-	 * @throws RserveException
+	 * @throws Exception
 	 *             An exception is thrown when Java is unable to connect to
 	 *             RServe.
+	 * 
 	 */
-	private REXP evalScript(String scriptPath) throws RserveException {
+	private REXP evalScriptFunction(String scriptPath, String functionName, String[] parameters) throws Exception {
 
-		return rconnect.eval(scriptPath);
+		try {
+
+			rconnect.eval("source(\"" + scriptPath + "\")");
+
+			return rconnect.eval(constructFunctionDefinition(functionName, parameters));
+
+		} catch (RserveException e) {
+
+			throw new Exception(e.getMessage());
+		}
 
 	}
-	
-	public 
-	
+
+	/**
+	 * Allows to transform a R dataframe into a Object Matrix.
+	 * 
+	 * @param list
+	 *            The list to be transformed.
+	 * @return The dataframe in its Java representation.
+	 * @throws REXPMismatchException REXP exception.
+	 */
+	private Object[][] transformDataframe(RList list) throws REXPMismatchException {
+		
+		int rows = list.at(0).length();
+		int cols = list.capacity();
+		
+		Object[][] dataframe = new Object[rows+1][cols];
+		
+		Vector<?> names = list.names;
+		
+		for(int i = 0; i < names.size(); i++)
+		{
+			dataframe[0][i] = names.get(i);
+		}
+		
+		for(int c = 0; c < cols; c++)
+		{
+			String[] column = list.at(c).asStrings();
+			
+			for(int r = 0; r < rows; r++)
+			{
+				
+				dataframe[r+1][c] = column[r];
+				
+			}
+			
+		}
+		
+		return dataframe;
+
+	}
+
+	/**
+	 * Allows to call a R script and obtain a response.
+	 * 
+	 * @param scriptFile
+	 *            The script file to be executed.
+	 * @param rType
+	 *            The expected return type.
+	 * @param scriptPath
+	 *            The path of the script to evaluate.
+	 * @param functionName
+	 *            The name of the function.
+	 * @param parameters
+	 *            The parameters of the function.
+	 * @return The result from calling the script.
+	 * @throws Exception
+	 *             An exception is thrown when Java is unable to connect to
+	 *             RServe or when a casting is not possible.
+	 * 
+	 */
+	public Object callScriptFunction(File scriptFile, ReturnType rType, String functionName, String[] parameters)
+			throws Exception {
+
+		String absolutePath = scriptFile.getAbsolutePath();
+
+		REXP result = evalScriptFunction(absolutePath, functionName, parameters);
+
+		Object response;
+
+		switch (rType) {
+
+		case BYTES:
+			response = result.asBytes();
+			break;
+
+		case DOUBLE:
+			response = result.asDouble();
+			break;
+
+		case DOUBLE_MATRIX:
+			response = result.asDoubleMatrix();
+			break;
+
+		case DOUBLE_ARRAY:
+			response = result.asDoubles();
+			break;
+
+		case FACTOR:
+			response = result.asFactor().asStrings();
+			break;
+
+		case INTEGER:
+			response = result.asInteger();
+			break;
+
+		case INTEGER_ARRAY:
+			response = result.asIntegers();
+			break;
+
+		case RLIST:
+			response = result.asList();
+			break;
+
+		case NATIVE_JAVA_OBJECT:
+			response = result.asNativeJavaObject();
+			break;
+
+		case STRING:
+			response = result.asString();
+			break;
+
+		case STRING_ARRAY:
+			response = result.asStrings();
+			break;
+
+		case DATAFRAME:
+			response = transformDataframe(result.asList());
+			break;
+
+		default:
+			response = null;
+
+		}
+
+		return response;
+
+	}
 
 	/**
 	 * Allows to stop the Rserve server,
 	 * 
-	 * @throws RserveException
+	 * @throws Exception
 	 *             An exception is thrown when Java is unable to connect to
 	 *             RServe.
+	 * 
 	 */
-	public void stopServer() throws RserveException {
+	public void stopServer() throws Exception {
 
-		rconnect.serverShutdown();
+		try {
+
+			rconnect.serverShutdown();
+
+		} catch (RserveException e) {
+
+			throw new Exception(e.getMessage());
+		}
 
 	}
 

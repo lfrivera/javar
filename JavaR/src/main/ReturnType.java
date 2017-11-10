@@ -17,6 +17,7 @@ public enum ReturnType {
 	RLIST,
 	NATIVE_JAVA_OBJECT,
 	STRING,
-	STRING_ARRAY
+	STRING_ARRAY,
+	DATAFRAME
 	
 }
