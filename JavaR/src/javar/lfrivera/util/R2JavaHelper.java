@@ -1,4 +1,4 @@
-package main;
+package javar.lfrivera.util;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package main;
+package javar.lfrivera.util;
 
 /**
  * This Enum specifies the return types of R expressions evaluation.

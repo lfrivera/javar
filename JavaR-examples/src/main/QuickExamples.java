@@ -2,6 +2,9 @@ package main;
 
 import java.io.File;
 
+import javar.lfrivera.util.R2JavaHelper;
+import javar.lfrivera.util.ReturnType;
+
 /**
  * This class allows to test the JavaR-related classes.
  * 

@@ -1,4 +1,4 @@
-package main;
+package javar.lfrivera.util;
 
 /**
  * This Singleton-based class allows to start Rserve.
@@ -70,9 +70,19 @@ class RServeStarter {
 
 	/**
 	 * Allows to start Rserve on windows systems.
+	 * 
+	 * @throws Exception
+	 *             An exception is thrown when Rserve could not be started.
 	 */
-	private void startOnWindows() {
-		throw new UnsupportedOperationException();
+	private void startOnWindows() throws Exception {
+
+		// This code is based on:
+		// https://stackoverflow.com/questions/44246794/how-to-start-rserve-automatically-from-java-in-windows
+
+		// Process p = Runtime.getRuntime().exec("Rscript -e \"library(Rserve);
+		// Rserve()\"");
+		// p.waitFor();
+
 	}
 
 	/**
@@ -91,14 +101,17 @@ class RServeStarter {
 		Process p = Runtime.getRuntime().exec("R CMD Rserve --vanilla");
 
 		p.waitFor();
-		
+
 	}
 
 	/**
 	 * Allows to start Rserve on MAc systems.
+	 * 
+	 * @throws Exception
+	 *             An exception is thrown when Rserve could not be started.
 	 */
-	private void startOnMac() {
-		throw new UnsupportedOperationException();
+	private void startOnMac() throws Exception {
+		startOnLinux();
 	}
 
 	/**
