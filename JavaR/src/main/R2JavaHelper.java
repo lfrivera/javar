@@ -1,6 +1,7 @@
 package main;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Vector;
 
 import org.rosuda.REngine.REXP;
@@ -36,6 +37,8 @@ public class R2JavaHelper {
 	 */
 	private R2JavaHelper() throws Exception {
 
+		RServeStarter.getInstance().startRserve();
+		
 		try {
 
 			rconnect = new RConnection();
@@ -287,6 +290,20 @@ public class R2JavaHelper {
 			throw new Exception(e.getMessage());
 		}
 
+	}
+	
+	/**
+	 * Allows to kill the process associated with Rserve.
+	 * 
+	 * @throws IOException A throwable exception.
+	 * @throws InterruptedException A throwable exception.
+	 */
+	public void killServer() throws IOException, InterruptedException {
+		
+		Process p = Runtime.getRuntime().exec("killall -INT Rserve");
+
+		p.waitFor();
+		
 	}
 
 }
