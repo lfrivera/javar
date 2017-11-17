@@ -19,6 +19,11 @@ import org.rosuda.REngine.Rserve.RserveException;
 public class R2JavaHelper {
 
 	/**
+	 * The name of the component on the console.
+	 */
+	private final String COMPONENT_NAME_ON_CONSOLE = ">R2JavaHelper:";
+	
+	/**
 	 * Unique instance of the class.
 	 */
 	private static R2JavaHelper instance;
@@ -134,9 +139,15 @@ public class R2JavaHelper {
 
 		try {
 
+			System.out.println(COMPONENT_NAME_ON_CONSOLE + " Executing " + scriptPath + "script...");
+			
 			rconnect.eval("source(\"" + scriptPath + "\")");
-
-			return rconnect.eval(constructFunctionDefinition(functionName, parameters));
+			
+			REXP response = rconnect.eval(constructFunctionDefinition(functionName, parameters));
+			
+			System.out.println(COMPONENT_NAME_ON_CONSOLE + " Script executed successfully.");
+			
+			return response;
 
 		} catch (RserveException e) {
 
@@ -293,7 +304,7 @@ public class R2JavaHelper {
 	}
 	
 	/**
-	 * Allows to kill the process associated with Rserve.
+	 * Allows to kill the process associated with Rserve (linux).
 	 * 
 	 * @throws IOException A throwable exception.
 	 * @throws InterruptedException A throwable exception.
