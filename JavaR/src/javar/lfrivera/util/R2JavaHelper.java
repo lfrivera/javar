@@ -17,11 +17,6 @@ import org.rosuda.REngine.Rserve.RserveException;
  *
  */
 public class R2JavaHelper {
-
-	/**
-	 * The name of the component on the console.
-	 */
-	private final String COMPONENT_NAME_ON_CONSOLE = ">R2JavaHelper:";
 	
 	/**
 	 * Unique instance of the class.
@@ -32,6 +27,11 @@ public class R2JavaHelper {
 	 * Connection to the RServe daemon.
 	 */
 	private RConnection rconnect;
+	
+	/**
+	 * The console printer.
+	 */
+	private ConsolePrinter printer;
 
 	/**
 	 * Private constructor of the class.
@@ -42,6 +42,8 @@ public class R2JavaHelper {
 	 */
 	private R2JavaHelper() throws Exception {
 
+		printer = new ConsolePrinter(PrintHeaderEnum.R2JAVA_HELPER);
+		
 		RServeStarter.getInstance().startRserve();
 		
 		try {
@@ -139,13 +141,13 @@ public class R2JavaHelper {
 
 		try {
 
-			System.out.println(COMPONENT_NAME_ON_CONSOLE + " Executing " + scriptPath + "script...");
+			printer.print("Executing " + scriptPath + "script...");
 			
 			rconnect.eval("source(\"" + scriptPath + "\")");
 			
 			REXP response = rconnect.eval(constructFunctionDefinition(functionName, parameters));
 			
-			System.out.println(COMPONENT_NAME_ON_CONSOLE + " Script executed successfully.");
+			printer.print("Script executed successfully.");
 			
 			return response;
 

@@ -24,7 +24,7 @@ public class QuickExamples {
 			
 			testAsInteger();
 			System.out.println("---------------------------");
-			testDataframe();
+			//testDataframe();
 		
 		} catch (Exception e) {
 			
@@ -41,7 +41,7 @@ public class QuickExamples {
 	 */
 	private static void testAsInteger() throws Exception
 	{
-		File script = new File("../JavaR-examples/scripts/Palindrome.R");
+		File script = new File("E:\\Repositories\\Git\\javar\\JavaR-examples\\scripts\\Palindrome.R");
 		String[] params = {"ojo"};
 		String function = "palindrome";
 		int result =  (int) R2JavaHelper.getInstance().callScriptFunction(script, ReturnType.INTEGER,function,params);

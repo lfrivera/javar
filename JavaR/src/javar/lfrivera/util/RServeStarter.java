@@ -1,8 +1,11 @@
 package javar.lfrivera.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
+import org.rosuda.REngine.Rserve.RConnection;
 
 /**
  * This Singleton-based class allows to start Rserve.
@@ -13,14 +16,14 @@ import java.io.InputStreamReader;
 class RServeStarter {
 
 	/**
-	 * The name of the component on the console.
-	 */
-	private final String COMPONENT_NAME_ON_CONSOLE = ">RServeStarter:";
-	
-	/**
 	 * Unique instance of the class.
 	 */
 	private static RServeStarter instance;
+
+	/**
+	 * The class that allows to print a message on console.
+	 */
+	private static ConsolePrinter printer;
 
 	// OS constants.
 	private final String WIN_OS = "Windows";
@@ -36,7 +39,7 @@ class RServeStarter {
 	 * Private constructor of the class.
 	 */
 	private RServeStarter() {
-
+		printer = new ConsolePrinter(PrintHeaderEnum.RSERVE_STARTER);
 		detectOS();
 
 	}
@@ -84,8 +87,8 @@ class RServeStarter {
 	 * @throws InterruptedException
 	 *             An exception is thrown when a error occurs in the console.
 	 * @throws IOException
-	 *             An exception is thrown when there is an error with the reading
-	 *             process from console..
+	 *             An exception is thrown when there is an error with the
+	 *             reading process from console..
 	 */
 	private boolean isRunningServer() throws InterruptedException, IOException {
 
@@ -118,12 +121,31 @@ class RServeStarter {
 			break;
 		}
 
+		printer.print("Rserve already started on " + currentOS + ": " + response);
+
 		return response;
 
 	}
 
 	private boolean isRunningServerWindows() {
-		throw new UnsupportedOperationException();
+
+		boolean response;
+
+		try {
+
+			RConnection c = new RConnection();
+			c.close();
+
+			response = true;
+
+		} catch (Exception e) {
+
+			response = false;
+
+		}
+
+		return response;
+
 	}
 
 	/**
@@ -133,27 +155,40 @@ class RServeStarter {
 	 * @throws InterruptedException
 	 *             An exception is thrown when a error occurs in the console.
 	 * @throws IOException
-	 *             An exception is thrown when there is an error with the reading
-	 *             process from console.
+	 *             An exception is thrown when there is an error with the
+	 *             reading process from console.
 	 */
 	private boolean isRunningServerLinux() throws InterruptedException, IOException {
 
 		// Based on:
 		// https://stackoverflow.com/questions/44246794/how-to-start-rserve-automatically-from-java-in-windows
 
-		// check the runtime environment to see if there's an active Rserve running
+		// check the runtime environment to see if there's an active Rserve
+		// running
 		String existingRserve = "";
 		Process p = Runtime.getRuntime().exec("pidof Rserve");
 		p.waitFor();
 		BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		existingRserve = in.readLine();
-		
+
 		return existingRserve != null;
-		
+
 	}
 
-	private boolean isRunningServerMac() {
-		throw new UnsupportedOperationException();
+	/**
+	 * Allows to detect if Rserve is already running on Mac.
+	 * 
+	 * @return Running status.
+	 * @throws InterruptedException
+	 *             An exception is thrown when a error occurs in the console.
+	 * @throws IOException
+	 *             An exception is thrown when there is an error with the
+	 *             reading process from console.
+	 */
+	private boolean isRunningServerMac() throws InterruptedException, IOException {
+
+		return isRunningServerLinux();
+
 	}
 
 	/**
@@ -165,11 +200,32 @@ class RServeStarter {
 	private void startOnWindows() throws Exception {
 
 		// This code is based on:
-		// https://stackoverflow.com/questions/44246794/how-to-start-rserve-automatically-from-java-in-windows
+		// https://github.com/s-u/REngine/blob/master/Rserve/test/StartRserve.java
 
-		// Process p = Runtime.getRuntime().exec("Rscript -e \"library(Rserve);
-		// Rserve()\"");
-		// p.waitFor();
+		String installPath = null;
+
+		Process rp = Runtime.getRuntime().exec("reg query HKLM\\Software\\R-core\\R");
+
+		StreamHog regHog = new StreamHog(rp.getInputStream(), true);
+
+		rp.waitFor();
+
+		regHog.join();
+
+		installPath = regHog.getInstallPath();
+
+		if (installPath == null) {
+
+			printer.print(
+					"ERROR: can not find path to R. Make sure reg is available and R was installed with registry settings.");
+
+		} else {
+
+			String rServePath = installPath + "\\bin\\R.exe";
+			
+			@SuppressWarnings("unused")
+			Process p = Runtime.getRuntime().exec("\""+rServePath+"\" -e \"library(Rserve);Rserve(FALSE"+",args='"+"--no-save --slave"+"')\" "+"--no-save --slave");
+		}
 
 	}
 
@@ -182,28 +238,71 @@ class RServeStarter {
 	private void startOnLinux() throws Exception {
 
 		// This code is based on:
-		// https://stackoverflow.com/questions/32373372/how-to-start-rserve-automatically-from-java
+		// https://github.com/s-u/REngine/blob/master/Rserve/test/StartRserve.java.
 
-		// run the Unix ""R CMD RServe --vanilla"" command
-		// using the Runtime exec method:
-		
-		System.out.println(COMPONENT_NAME_ON_CONSOLE + " Starting Rserve on linux...");
-		
-		Process p = Runtime.getRuntime().exec("R CMD Rserve --vanilla");
+		Process p = Runtime.getRuntime()
+				.exec(new String[] { "/bin/sh", "-c", "echo 'library(Rserve);Rserve(FALSE" + ",args=\""
+						+ "--no-save --slave" + "\")'|" + getRinstallationPathUnix() + " " + "--no-save --slave" });
+
+		printer.print("Starting Rserve on " + currentOS + "...");
+
+		// we need to fetch the output - some platforms will die if you don't
+
+		@SuppressWarnings("unused")
+		StreamHog errorHog = new StreamHog(p.getErrorStream(), false);
+
+		@SuppressWarnings("unused")
+		StreamHog outputHog = new StreamHog(p.getInputStream(), false);
+
 		p.waitFor();
-		
-		System.out.println(COMPONENT_NAME_ON_CONSOLE + " Rserve started.");
 
+		printer.print("Rserve started.");
 	}
 
 	/**
-	 * Allows to start Rserve on MAc systems.
+	 * Allows to start Rserve on Mac systems.
 	 * 
 	 * @throws Exception
 	 *             An exception is thrown when Rserve could not be started.
 	 */
 	private void startOnMac() throws Exception {
-		throw new UnsupportedOperationException();
+
+		startOnLinux();
+	}
+
+	/**
+	 * Allows to obtain the R installation path.
+	 * 
+	 * @return The R installation path.
+	 */
+	private String getRinstallationPathUnix() {
+		String path = null;
+
+		// Based on:
+		// https://github.com/s-u/REngine/blob/master/Rserve/test/StartRserve.java.
+
+		String possiblePaths[] = { "/Library/Frameworks/R.framework/Resources/bin/R", "/usr/local/lib/R/bin/R",
+				"/usr/lib/R/bin/R", "/usr/local/bin/R", "/sw/bin/R", "/usr/common/bin/R", "/opt/bin/R" };
+
+		boolean exists = false;
+
+		for (int i = 0; i < possiblePaths.length && exists == false; i++) {
+
+			String actual = possiblePaths[i];
+
+			File file = new File(actual);
+
+			exists = file.exists();
+
+			if (exists) {
+
+				path = actual;
+
+			}
+
+		}
+
+		return path;
 	}
 
 	/**
@@ -214,8 +313,8 @@ class RServeStarter {
 	 */
 	public void startRserve() throws Exception {
 
-		if(!isRunningServer()) {
-			
+		if (!isRunningServer()) {
+
 			switch (currentOS) {
 
 			case WIN_OS:
@@ -231,7 +330,7 @@ class RServeStarter {
 				break;
 
 			}
-			
+
 		}
 
 	}
