@@ -2,6 +2,7 @@ package main;
 
 import java.io.File;
 
+import javar.lfrivera.entity.Dataframe;
 import javar.lfrivera.util.R2JavaHelper;
 import javar.lfrivera.util.ReturnType;
 
@@ -22,9 +23,11 @@ public class QuickExamples {
 	{
 		try {
 			
+			System.out.println("---------------------------");
 			testAsInteger();
 			System.out.println("---------------------------");
-			//testDataframe();
+			testDataframe();
+			System.out.println("---------------------------");
 		
 		} catch (Exception e) {
 			
@@ -41,7 +44,7 @@ public class QuickExamples {
 	 */
 	private static void testAsInteger() throws Exception
 	{
-		File script = new File("E:\\Repositories\\Git\\javar\\JavaR-examples\\scripts\\Palindrome.R");
+		File script = new File("../JavaR-examples/scripts/Palindrome.R");
 		String[] params = {"ojo"};
 		String function = "palindrome";
 		int result =  (int) R2JavaHelper.getInstance().callScriptFunction(script, ReturnType.INTEGER,function,params);
@@ -55,26 +58,14 @@ public class QuickExamples {
 	 */
 	private static void testDataframe() throws Exception
 	{
-		File script = new File("/home/amelia/Repositories/Git/javar/JavaR-examples/scripts/DaframeGeneration.R");
+		File script = new File("../JavaR-examples/scripts/DaframeGeneration.R");
 		String function = "framing";
 		String[] params = null;
-		Object[][] dataframe = (Object[][]) R2JavaHelper.getInstance().callScriptFunction(script, ReturnType.DATAFRAME,function,params);
-		printDataframe(dataframe);
-	}
-	
-	/**
-	 * Allows to print a dataframe on console.
-	 * 
-	 * @param dataframe The dataframe.
-	 */
-	private static void printDataframe(Object[][] dataframe)
-	{
-		for (int i = 0; i < dataframe.length; i++) {
-		    for (int j = 0; j < dataframe[i].length; j++) {
-		        System.out.print(dataframe[i][j] + " ");
-		    }
-		    System.out.println();
-		}
+		Dataframe dataframe = (Dataframe) R2JavaHelper.getInstance().callScriptFunction(script, ReturnType.DATAFRAME,function,params);
+		System.out.println("Full dataframe:");
+		dataframe.print();
+		System.out.println("Head:");
+		dataframe.head(2);
 	}
 	
 }

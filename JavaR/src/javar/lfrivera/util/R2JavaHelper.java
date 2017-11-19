@@ -10,6 +10,8 @@ import org.rosuda.REngine.RList;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 
+import javar.lfrivera.entity.Dataframe;
+
 /**
  * This Singleton-based class allows Java to interact with R.
  * 
@@ -166,7 +168,7 @@ public class R2JavaHelper {
 	 * @return The dataframe in its Java representation.
 	 * @throws REXPMismatchException REXP exception.
 	 */
-	private Object[][] transformDataframe(RList list) throws REXPMismatchException {
+	private Dataframe transformDataframe(RList list) throws REXPMismatchException {
 		
 		int rows = list.at(0).length();
 		int cols = list.capacity();
@@ -193,7 +195,7 @@ public class R2JavaHelper {
 			
 		}
 		
-		return dataframe;
+		return new Dataframe(dataframe);
 
 	}
 
@@ -313,7 +315,7 @@ public class R2JavaHelper {
 	 */
 	public void killServer() throws IOException, InterruptedException {
 		
-		Process p = Runtime.getRuntime().exec("killall -INT Rserve");
+		Process p = Runtime.getRuntime().exec("killall Rserve");
 
 		p.waitFor();
 		
