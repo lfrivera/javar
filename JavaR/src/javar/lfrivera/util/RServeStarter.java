@@ -23,25 +23,13 @@ class RServeStarter {
 	/**
 	 * The class that allows to print a message on console.
 	 */
-	private static ConsolePrinter printer;
-
-	// OS constants.
-	private final String WIN_OS = "Windows";
-	private final String LIN_OS = "Linux";
-	private final String MAC_OS = "Mac";
-
-	/**
-	 * The current operative system.
-	 */
-	private String currentOS;
+	private ConsolePrinter printer;
 
 	/**
 	 * Private constructor of the class.
 	 */
 	private RServeStarter() {
 		printer = new ConsolePrinter(PrintHeaderEnum.RSERVE_STARTER);
-		detectOS();
-
 	}
 
 	/**
@@ -59,28 +47,6 @@ class RServeStarter {
 	}
 
 	/**
-	 * Allows to detect the current operative system of the user.
-	 */
-	private void detectOS() {
-		// Based on:
-		// https://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/
-
-		String os = System.getProperty("os.name").toLowerCase();
-
-		if (os.indexOf("win") >= 0) {
-			currentOS = WIN_OS;
-		}
-
-		if (os.indexOf("mac") >= 0) {
-			currentOS = MAC_OS;
-		}
-
-		if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") > 0) {
-			currentOS = LIN_OS;
-		}
-	}
-
-	/**
 	 * Allows to determine whether the Rserver daemon is running.
 	 * 
 	 * @return Running status.
@@ -94,21 +60,21 @@ class RServeStarter {
 
 		boolean response;
 
-		switch (currentOS) {
+		switch (OsDetector.getInstance().getCurrentOS()) {
 
-		case WIN_OS:
+		case OsDetector.WIN_OS:
 
 			response = isRunningServerWindows();
 
 			break;
 
-		case LIN_OS:
+		case OsDetector.LIN_OS:
 
 			response = isRunningServerLinux();
 
 			break;
 
-		case MAC_OS:
+		case OsDetector.MAC_OS:
 
 			response = isRunningServerMac();
 
@@ -121,7 +87,7 @@ class RServeStarter {
 			break;
 		}
 
-		printer.print("Rserve already started on " + currentOS + ": " + response);
+		printer.print("Rserve already started on " + OsDetector.getInstance().getCurrentOS() + ": " + response);
 
 		return response;
 
@@ -222,9 +188,10 @@ class RServeStarter {
 		} else {
 
 			String rServePath = installPath + "\\bin\\R.exe";
-			
+
 			@SuppressWarnings("unused")
-			Process p = Runtime.getRuntime().exec("\""+rServePath+"\" -e \"library(Rserve);Rserve(FALSE"+",args='"+"--no-save --slave"+"')\" "+"--no-save --slave");
+			Process p = Runtime.getRuntime().exec("\"" + rServePath + "\" -e \"library(Rserve);Rserve(FALSE" + ",args='"
+					+ "--no-save --slave" + "')\" " + "--no-save --slave");
 		}
 
 	}
@@ -244,8 +211,6 @@ class RServeStarter {
 				.exec(new String[] { "/bin/sh", "-c", "echo 'library(Rserve);Rserve(FALSE" + ",args=\""
 						+ "--no-save --slave" + "\")'|" + getRinstallationPathUnix() + " " + "--no-save --slave" });
 
-		printer.print("Starting Rserve on " + currentOS + "...");
-
 		// we need to fetch the output - some platforms will die if you don't
 
 		@SuppressWarnings("unused")
@@ -256,7 +221,6 @@ class RServeStarter {
 
 		p.waitFor();
 
-		printer.print("Rserve started.");
 	}
 
 	/**
@@ -315,21 +279,25 @@ class RServeStarter {
 
 		if (!isRunningServer()) {
 
-			switch (currentOS) {
+			printer.print("Starting Rserve on " + OsDetector.getInstance().getCurrentOS() + "...");
 
-			case WIN_OS:
+			switch (OsDetector.getInstance().getCurrentOS()) {
+
+			case OsDetector.WIN_OS:
 				startOnWindows();
 				break;
 
-			case LIN_OS:
+			case OsDetector.LIN_OS:
 				startOnLinux();
 				break;
 
-			case MAC_OS:
+			case OsDetector.MAC_OS:
 				startOnMac();
 				break;
 
 			}
+			
+			printer.print("Rserve started.");
 
 		}
 

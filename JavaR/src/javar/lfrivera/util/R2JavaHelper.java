@@ -19,7 +19,7 @@ import javar.lfrivera.entity.Dataframe;
  *
  */
 public class R2JavaHelper {
-	
+
 	/**
 	 * Unique instance of the class.
 	 */
@@ -29,7 +29,7 @@ public class R2JavaHelper {
 	 * Connection to the RServe daemon.
 	 */
 	private RConnection rconnect;
-	
+
 	/**
 	 * The console printer.
 	 */
@@ -45,9 +45,9 @@ public class R2JavaHelper {
 	private R2JavaHelper() throws Exception {
 
 		printer = new ConsolePrinter(PrintHeaderEnum.R2JAVA_HELPER);
-		
+
 		RServeStarter.getInstance().startRserve();
-		
+
 		try {
 
 			rconnect = new RConnection();
@@ -76,6 +76,41 @@ public class R2JavaHelper {
 
 		return instance;
 
+	}
+
+	/**
+	 * Allows to transform the script path to a specific format for Rserve.
+	 * 
+	 * @param path
+	 *            The path to transform.
+	 * @return The transformed path (depending on OS).
+	 */
+	private String transformScriptPath(String path) {
+
+		if(OsDetector.getInstance().getCurrentOS().equals(OsDetector.WIN_OS)) {
+			
+			char[] array = path.toCharArray();
+			
+			StringBuilder builder = new StringBuilder("");
+			
+			for(char c:array){
+				
+				if(c == 47 || c == 92) {
+					builder.append(File.separator);
+					builder.append(File.separator);
+				}
+				else
+				{
+					builder.append(c);
+				}
+				
+			}
+			
+			path = builder.toString();
+			
+		}
+		
+		return path;
 	}
 
 	/**
@@ -143,14 +178,16 @@ public class R2JavaHelper {
 
 		try {
 
+			scriptPath = transformScriptPath(scriptPath);
+
 			printer.print("Executing " + scriptPath + "script...");
-			
+
 			rconnect.eval("source(\"" + scriptPath + "\")");
-			
+
 			REXP response = rconnect.eval(constructFunctionDefinition(functionName, parameters));
-			
+
 			printer.print("Script executed successfully.");
-			
+
 			return response;
 
 		} catch (RserveException e) {
@@ -166,35 +203,33 @@ public class R2JavaHelper {
 	 * @param list
 	 *            The list to be transformed.
 	 * @return The dataframe in its Java representation.
-	 * @throws REXPMismatchException REXP exception.
+	 * @throws REXPMismatchException
+	 *             REXP exception.
 	 */
 	private Dataframe transformDataframe(RList list) throws REXPMismatchException {
-		
+
 		int rows = list.at(0).length();
 		int cols = list.capacity();
-		
-		Object[][] dataframe = new Object[rows+1][cols];
-		
+
+		Object[][] dataframe = new Object[rows + 1][cols];
+
 		Vector<?> names = list.names;
-		
-		for(int i = 0; i < names.size(); i++)
-		{
+
+		for (int i = 0; i < names.size(); i++) {
 			dataframe[0][i] = names.get(i);
 		}
-		
-		for(int c = 0; c < cols; c++)
-		{
+
+		for (int c = 0; c < cols; c++) {
 			String[] column = list.at(c).asStrings();
-			
-			for(int r = 0; r < rows; r++)
-			{
-				
-				dataframe[r+1][c] = column[r];
-				
+
+			for (int r = 0; r < rows; r++) {
+
+				dataframe[r + 1][c] = column[r];
+
 			}
-			
+
 		}
-		
+
 		return new Dataframe(dataframe);
 
 	}
@@ -306,19 +341,21 @@ public class R2JavaHelper {
 		}
 
 	}
-	
+
 	/**
 	 * Allows to kill the process associated with Rserve (linux).
 	 * 
-	 * @throws IOException A throwable exception.
-	 * @throws InterruptedException A throwable exception.
+	 * @throws IOException
+	 *             A throwable exception.
+	 * @throws InterruptedException
+	 *             A throwable exception.
 	 */
 	public void killServer() throws IOException, InterruptedException {
-		
+
 		Process p = Runtime.getRuntime().exec("killall Rserve");
 
 		p.waitFor();
-		
+
 	}
 
 }
