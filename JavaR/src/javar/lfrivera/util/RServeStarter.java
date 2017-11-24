@@ -153,7 +153,7 @@ class RServeStarter {
 	 */
 	private boolean isRunningServerMac() throws InterruptedException, IOException {
 
-		return isRunningServerLinux();
+		return isRunningServerWindows();
 
 	}
 
