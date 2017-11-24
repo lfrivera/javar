@@ -5,6 +5,7 @@ JavaR is a library that enables the integration between Java and R languages thr
 ## Prerequisites
 
 *   R programming language (<https://www.r-project.org/about.html>).
+*   X11 libraries **(Only on OS X systems)**. If not istalled, you can download it from: <https://www.xquartz.org/>.
 
 ## Configuration (Unix platforms)
 
