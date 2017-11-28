@@ -3,6 +3,7 @@ package javar.lfrivera.util;
 import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
@@ -49,7 +50,7 @@ public class R2JavaHelper {
 		RServeStarter.getInstance().startRserve();
 
 		try {
-
+			TimeUnit.SECONDS.sleep(1);
 			rconnect = new RConnection();
 
 		} catch (RserveException e) {
