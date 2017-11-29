@@ -85,30 +85,53 @@ public class Dataframe {
 
 		try {
 
-			Object first = rawRepresentation[1][index];
+			String first = (String) rawRepresentation[1][index];
 
-			if (first instanceof Integer) {
+			try {
+
+				Integer.parseInt(first);
 				c = Integer.class;
-			}
 
-			if (first instanceof Double) {
-				c = Double.class;
-			}
+			} catch (Exception e) {
 
-			if (first instanceof Long) {
-				c = Long.class;
-			}
+				try {
 
-			if (first instanceof Float) {
-				c = Float.class;
-			}
+					Double.parseDouble(first);
+					c = Double.class;
 
-			if (first instanceof String) {
-				c = String.class;
-			}
+				} catch (Exception e1) {
 
-			if (first instanceof Boolean) {
-				c = Boolean.class;
+					try {
+
+						Long.parseLong(first);
+						c = Long.class;
+
+					} catch (Exception e2) {
+
+						try {
+
+							Float.parseFloat(first);
+							c = Float.class;
+
+						} catch (Exception e3) {
+
+							if (first.equalsIgnoreCase("TRUE") || first.equalsIgnoreCase("FALSE")
+									|| first.equalsIgnoreCase("T") || first.equalsIgnoreCase("F")) {
+
+								c = Boolean.class;
+
+							} else {
+
+								c = String.class;
+
+							}
+
+						}
+
+					}
+
+				}
+
 			}
 
 		} catch (Exception e) {
@@ -507,28 +530,28 @@ public class Dataframe {
 					CompareCondition condition = conditions[c];
 
 					int columnIndex = colnames(condition.getColumnName());
-					
+
 					if (typeOfColumn(columnIndex) == Integer.class) {
 						
-						Integer obj1 = (Integer) rawRepresentation[i][columnIndex];
+						Integer obj1 = Integer.parseInt((String) rawRepresentation[i][columnIndex]);
 						Integer obj2 = Integer.parseInt(condition.getExpectedValue());
 						Comparator<Integer> comparator = new Comparator<Integer>(condition.getType());
 						correct = comparator.compare(obj1, obj2);
-						
+
 					}
 
 					if (typeOfColumn(condition.getColumnName()) == Double.class) {
 
-						Double obj1 = (Double) rawRepresentation[i][columnIndex];
+						Double obj1 = Double.parseDouble((String) rawRepresentation[i][columnIndex]);
 						Double obj2 = Double.parseDouble(condition.getExpectedValue());
 						Comparator<Double> comparator = new Comparator<Double>(condition.getType());
 						correct = comparator.compare(obj1, obj2);
-						
+
 					}
 
 					if (typeOfColumn(condition.getColumnName()) == Long.class) {
-						
-						Long obj1 = (Long) rawRepresentation[i][columnIndex];
+
+						Long obj1 = Long.parseLong((String) rawRepresentation[i][columnIndex]);
 						Long obj2 = Long.parseLong(condition.getExpectedValue());
 						Comparator<Long> comparator = new Comparator<Long>(condition.getType());
 						correct = comparator.compare(obj1, obj2);
@@ -536,11 +559,11 @@ public class Dataframe {
 
 					if (typeOfColumn(condition.getColumnName()) == Float.class) {
 
-						Float obj1 = (Float) rawRepresentation[i][columnIndex];
+						Float obj1 = Float.parseFloat((String) rawRepresentation[i][columnIndex]);
 						Float obj2 = Float.parseFloat(condition.getExpectedValue());
 						Comparator<Float> comparator = new Comparator<Float>(condition.getType());
 						correct = comparator.compare(obj1, obj2);
-						
+
 					}
 
 					if (typeOfColumn(condition.getColumnName()) == String.class) {
@@ -549,21 +572,21 @@ public class Dataframe {
 						String obj2 = condition.getExpectedValue();
 						Comparator<String> comparator = new Comparator<String>(condition.getType());
 						correct = comparator.compare(obj1, obj2);
-						
+
 					}
 
 					if (typeOfColumn(condition.getColumnName()) == Boolean.class) {
 
-						Boolean obj1 = (Boolean) rawRepresentation[i][columnIndex];
+						Boolean obj1 = Boolean.parseBoolean((String) rawRepresentation[i][columnIndex]);
 						Boolean obj2 = Boolean.parseBoolean(condition.getExpectedValue());
 						Comparator<Boolean> comparator = new Comparator<Boolean>(condition.getType());
 						correct = comparator.compare(obj1, obj2);
-						
+
 					}
 				}
 
 				if (correct) {
-					aux.add(i-1);
+					aux.add(i - 1);
 				}
 
 			}

@@ -33,31 +33,58 @@ public class Comparator<T> {
 
 		Boolean result = null;
 
-		if (obj1 instanceof Integer || obj1 instanceof Double || obj1 instanceof Long || obj1 instanceof Float) {
+		if (obj1 instanceof Integer) {
+
+			int n1 = (int) obj1;
+			int n2 = (int) obj2;
+
+			result = compareNumbers(n1, n2);
+
+		}
+
+		if (obj1 instanceof Double) {
 
 			double n1 = (double) obj1;
 			double n2 = (double) obj2;
-			
+
 			result = compareNumbers(n1, n2);
-			
+
+		}
+
+		if (obj1 instanceof Long) {
+
+			long n1 = (long) obj1;
+			long n2 = (long) obj2;
+
+			result = compareNumbers(n1, n2);
+
+		}
+
+		if (obj1 instanceof Float) {
+
+			float n1 = (float) obj1;
+			float n2 = (float) obj2;
+
+			result = compareNumbers(n1, n2);
+
 		}
 
 		if (obj1 instanceof String) {
-			
+
 			String s1 = (String) obj1;
 			String s2 = (String) obj2;
-			
+
 			result = compareStrings(s1, s2);
-			
+
 		}
 
 		if (obj1 instanceof Boolean) {
 
-			int i1 = (int) obj1;
-			int i2 = (int) obj2;
-			
+			int i1 = ((boolean) obj1) == true ? 1 : 0;
+			int i2 = ((boolean) obj2) == true ? 1 : 0;
+
 			result = compareNumbers(i1, i2);
-			
+
 		}
 
 		if (result == null) {
@@ -72,8 +99,10 @@ public class Comparator<T> {
 	/**
 	 * Allows to compare two numbers.
 	 * 
-	 * @param n1 The first number to compare.
-	 * @param n2 The second number to compare.
+	 * @param n1
+	 *            The first number to compare.
+	 * @param n2
+	 *            The second number to compare.
 	 * @return Boolean value that describes the result of the comparison.
 	 */
 	private Boolean compareNumbers(double n1, double n2) {
@@ -85,37 +114,37 @@ public class Comparator<T> {
 		case EQUAL_TO:
 
 			result = n1 == n2;
-			
+
 			break;
 
 		case NOT_EQUAL_TO:
 
 			result = (n1 != n2);
-			
+
 			break;
 
 		case GREATER_THAN:
 
 			result = (n1 > n2);
-			
+
 			break;
 
 		case GREATER_THAN_EQUAL_TO:
 
 			result = (n1 >= n2);
-			
+
 			break;
 
 		case LESS_THAN:
 
 			result = (n1 < n2);
-			
+
 			break;
 
 		case LESS_THAN_EQUAL_TO:
 
 			result = (n1 <= n2);
-			
+
 			break;
 
 		default:
@@ -132,8 +161,10 @@ public class Comparator<T> {
 	/**
 	 * Allows to compare two strings.
 	 * 
-	 * @param s1 The first String to compare.
-	 * @param s2 The second String to compare.
+	 * @param s1
+	 *            The first String to compare.
+	 * @param s2
+	 *            The second String to compare.
 	 * @return Boolean value that describes the result of the comparison.
 	 */
 	private Boolean compareStrings(String s1, String s2) {
@@ -145,29 +176,29 @@ public class Comparator<T> {
 		case EQUAL_TO:
 
 			result = (s1.equals(s2));
-			
+
 			break;
 
 		case NOT_EQUAL_TO:
 
 			result = (!s1.equals(s2));
-			
+
 			break;
 
 		case GREATER_THAN:
 
 			result = (s1.length() > s2.length());
-			
+
 			break;
 
 		case GREATER_THAN_EQUAL_TO:
-			
+
 			result = (s1.length() >= s2.length());
 
 			break;
 
 		case LESS_THAN:
-			
+
 			result = (s1.length() < s2.length());
 
 			break;
@@ -175,7 +206,7 @@ public class Comparator<T> {
 		case LESS_THAN_EQUAL_TO:
 
 			result = (s1.length() <= s2.length());
-			
+
 			break;
 
 		default:
