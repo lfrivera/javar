@@ -132,8 +132,8 @@ public class QuickExamples {
 		dataframe.print();
 		System.out.println("---");
 		CompareCondition[] conditions = {
-				new CompareCondition("Q", "b", ComparisonTypeEnum.NOT_EQUAL_TO)
-				new CompareCondition("Q", expectedValue, type)
+				new CompareCondition("Q", "b", ComparisonTypeEnum.NOT_EQUAL_TO),
+				new CompareCondition("Q", "a", ComparisonTypeEnum.NOT_EQUAL_TO)
 				};
 		printArray(dataframe.getRowsWhere(conditions));
 	}
