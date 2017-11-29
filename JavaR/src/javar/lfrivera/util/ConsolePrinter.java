@@ -1,5 +1,7 @@
 package javar.lfrivera.util;
 
+import javar.lfrivera.entity.PrintHeaderEnum;
+
 /**
  * This class allows to print on console.
  * 

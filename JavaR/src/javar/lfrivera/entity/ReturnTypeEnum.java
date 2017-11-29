@@ -1,11 +1,11 @@
-package javar.lfrivera.util;
+package javar.lfrivera.entity;
 
 /**
  * This Enum specifies the return types of R expressions evaluation.
  * @author lfrivera
  *
  */
-public enum ReturnType {
+public enum ReturnTypeEnum {
 
 	BYTES,
 	DOUBLE,

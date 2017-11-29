@@ -1,4 +1,4 @@
-package javar.lfrivera.util;
+package javar.lfrivera.entity;
 
 /**
  * This enum allows to specify the possible headers when printing from a component.

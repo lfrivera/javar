@@ -12,6 +12,8 @@ import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
 
 import javar.lfrivera.entity.Dataframe;
+import javar.lfrivera.entity.PrintHeaderEnum;
+import javar.lfrivera.entity.ReturnTypeEnum;
 
 /**
  * This Singleton-based class allows Java to interact with R.
@@ -254,7 +256,7 @@ public class R2JavaHelper {
 	 *             RServe or when a casting is not possible.
 	 * 
 	 */
-	public Object callScriptFunction(File scriptFile, ReturnType rType, String functionName, String[] parameters)
+	public Object callScriptFunction(File scriptFile, ReturnTypeEnum rType, String functionName, String[] parameters)
 			throws Exception {
 
 		String absolutePath = scriptFile.getAbsolutePath();

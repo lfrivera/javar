@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 
 import org.rosuda.REngine.Rserve.RConnection;
 
+import javar.lfrivera.entity.PrintHeaderEnum;
+
 /**
  * This Singleton-based class allows to start Rserve.
  * 
