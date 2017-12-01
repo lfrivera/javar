@@ -185,9 +185,21 @@ public class R2JavaHelper {
 
 			printer.print("Executing " + scriptPath + "script...");
 
-			rconnect.eval("source(\"" + scriptPath + "\")");
+			String source = "source(\"" + scriptPath + "\")";
+			
+			printer.print("Performing eval: " + source + "...");
+			
+			rconnect.eval(source);
+			
+			printer.print("Eval executed successfully.");
 
-			REXP response = rconnect.eval(constructFunctionDefinition(functionName, parameters));
+			String function = constructFunctionDefinition(functionName, parameters);
+			
+			printer.print("Performing eval: " + function + "...");
+			
+			REXP response = rconnect.eval(function);
+			
+			printer.print("Eval executed successfully.");
 
 			printer.print("Script executed successfully.");
 
