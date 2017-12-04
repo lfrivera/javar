@@ -88,7 +88,7 @@ public class R2JavaHelper {
 	 *            The path to transform.
 	 * @return The transformed path (depending on OS).
 	 */
-	private String transformScriptPath(String path) {
+	public String transformScriptPath(String path) {
 
 		if(OsDetector.getInstance().getCurrentOS().equals(OsDetector.WIN_OS)) {
 			

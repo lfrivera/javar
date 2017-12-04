@@ -145,6 +145,20 @@ public class Dataframe {
 	}
 
 	/**
+	 * Allows to determine whether a column is numeric.
+	 * 
+	 * @param index
+	 *            The column to be evaluated.
+	 */
+	private boolean realizeIsColNumeric(int index) {
+		
+		Class<?> type = typeOfColumn(index);
+		
+		return (type == Integer.class || type == Float.class || type == Double.class || type == Long.class);
+		
+	}
+
+	/**
 	 * Allows to obtain the raw representation of the dataframe.
 	 * 
 	 * @return The raw representation of the dataframe.
@@ -462,6 +476,28 @@ public class Dataframe {
 	}
 
 	/**
+	 * Allows to determine whether a column is numeric.
+	 * 
+	 * @param colName
+	 *            The name of the column.
+	 * @return true if the column is numeric.
+	 */
+	public boolean isColNumeric(String colName) {
+		return realizeIsColNumeric(colnames(colName));
+	}
+
+	/**
+	 * Allows to determine whether a column is numeric.
+	 * 
+	 * @param colIndex
+	 *            The column index.
+	 * @return true if the column is numeric.
+	 */
+	public boolean isColNumeric(int colIndex) {
+		return realizeIsColNumeric(colIndex);
+	}
+
+	/**
 	 * Allows to obtain a column.
 	 * 
 	 * @param index
@@ -532,7 +568,7 @@ public class Dataframe {
 					int columnIndex = colnames(condition.getColumnName());
 
 					if (typeOfColumn(columnIndex) == Integer.class) {
-						
+
 						Integer obj1 = Integer.parseInt((String) rawRepresentation[i][columnIndex]);
 						Integer obj2 = Integer.parseInt(condition.getExpectedValue());
 						Comparator<Integer> comparator = new Comparator<Integer>(condition.getType());
