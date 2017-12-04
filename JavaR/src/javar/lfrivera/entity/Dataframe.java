@@ -640,5 +640,16 @@ public class Dataframe {
 		return rows;
 
 	}
+	
+	/**
+	 * Allows to obtain a value from an attribute of a column.
+	 * 
+	 * @param rowIndex The row selected.
+	 * @param attributeName The column/attribute name.
+	 * @return The searched value from a specific column of a row.
+	 */
+	public Object getAttributeValueFromRow(int rowIndex, String attributeName) {
+		return rawRepresentation[rowIndex+1][colnames(attributeName)];
+	}
 
 }
