@@ -372,5 +372,70 @@ public class R2JavaHelper {
 		p.waitFor();
 
 	}
+	
+	public Object obtainElementFromEnvironment(String name, ReturnTypeEnum rType) throws Exception {
+
+		REXP result = rconnect.eval(name);
+
+		Object response;
+
+		switch (rType) {
+
+		case BYTES:
+			response = result.asBytes();
+			break;
+
+		case DOUBLE:
+			response = result.asDouble();
+			break;
+
+		case DOUBLE_MATRIX:
+			response = result.asDoubleMatrix();
+			break;
+
+		case DOUBLE_ARRAY:
+			response = result.asDoubles();
+			break;
+
+		case FACTOR:
+			response = result.asFactor().asStrings();
+			break;
+
+		case INTEGER:
+			response = result.asInteger();
+			break;
+
+		case INTEGER_ARRAY:
+			response = result.asIntegers();
+			break;
+
+		case RLIST:
+			response = result.asList();
+			break;
+
+		case NATIVE_JAVA_OBJECT:
+			response = result.asNativeJavaObject();
+			break;
+
+		case STRING:
+			response = result.asString();
+			break;
+
+		case STRING_ARRAY:
+			response = result.asStrings();
+			break;
+
+		case DATAFRAME:
+			response = transformDataframe(result.asList());
+			break;
+
+		default:
+			response = null;
+
+		}
+
+		return response;
+		
+	}
 
 }
